@@ -86,8 +86,8 @@ glm::vec4 Renderer::perPixel(uint32_t x, uint32_t y)
 			break;
 		}
 		float intensity = glm::max(0.0f, glm::dot(-lightDir, payload.worldNormal));
-		auto obj = &activeScene->objects[payload.objectIndex];
-		Material material = activeScene->materials[obj->materialIndex];
+		//auto obj = &activeScene->objects[payload.objectIndex];
+		Material material = activeScene->materials[(&activeScene->objects[payload.objectIndex])->materialIndex];
 		finalColor += intensity * material.albedo * multiplr;
 		multiplr *= 0.5;
 		ray.origin = payload.worldPosition + 0.0001f * payload.worldNormal;
@@ -111,8 +111,8 @@ HitPayload Renderer::TraceRay(const Ray& ray)
 	float max_limit = FLT_MAX;
 	for (size_t i = 0; i < size; i++)
 	{
-		auto object = &activeScene->objects[i];
-		if (object->Hit(ray, 0.0f, max_limit, i, payload)) {
+		Sphere s = activeScene->objects[i];
+		if (s.Hit(ray, 0.001f, max_limit, i, payload)) {
 			max_limit = payload.hitDistance;
 		}		
 	}
@@ -126,12 +126,9 @@ HitPayload Renderer::TraceRay(const Ray& ray)
 
 void Renderer::HitclosetObj(const Ray& ray, HitPayload& payload)
 {
-	HitPayload result;
-	result.hitDistance = payload.hitDistance;
-	result.objectIndex = payload.objectIndex;
-	auto hitObj = &activeScene->objects[payload.objectIndex];
+	Sphere hitObj = activeScene->objects[payload.objectIndex];
 	payload.worldPosition = ray.origin + payload.hitDistance * ray.direction;
-	payload.worldNormal = hitObj->GetNormal(payload.worldPosition);
+	payload.worldNormal = hitObj.GetNormal(payload.worldPosition);
 }
 
 HitPayload Renderer::Miss(const Ray& ray)

@@ -5,7 +5,7 @@
 #include <glm/glm.hpp>
 #include "Camera.h"
 #include "Scene.h"
-#include "./Geometry/Sphere.h"
+
 
 class Renderer
 {
@@ -16,10 +16,10 @@ private:
 	struct Setting {
 		bool accumulate = false;
 	};
+	HitPayload Miss(const Ray& ray);
+	void HitclosetObj(const Ray& ray, HitPayload& payload);
 	glm::vec4 perPixel(uint32_t x, uint32_t y);
 	HitPayload TraceRay(const Ray& ray);
-	void HitclosetObj(const Ray& ray, HitPayload& payload);
-	HitPayload Miss(const Ray& ray);
 
 private:
 	std::shared_ptr<Walnut::Image> m_FinalImage;

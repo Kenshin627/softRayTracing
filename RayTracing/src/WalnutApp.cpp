@@ -69,12 +69,10 @@ public:
 		ImGui::Begin("Scene");
 		for (size_t i = 0; i < scene.objects.size(); i++)
 		{
-			Hittable& s = scene.objects[i];
+			Sphere& s = scene.objects[i];
 			ImGui::PushID(i);
-
 			ImGui::DragFloat3("position", glm::value_ptr(s.position), 0.1f);
-			//ImGui::DragFloat("radius", &s.radius, 0.01f);
-			//ImGui::ColorEdit3("albedo", glm::value_ptr(s.albedo));
+			ImGui::DragFloat("radius", &s.radius, 0.01f);
 			ImGui::Separator();
 			ImGui::PopID();
 		}
