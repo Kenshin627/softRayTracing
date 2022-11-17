@@ -86,8 +86,8 @@ glm::vec4 Renderer::perPixel(uint32_t x, uint32_t y)
 			break;
 		}
 		float intensity = glm::max(0.0f, glm::dot(-lightDir, payload.worldNormal));
-		auto obj = activeScene->spheres[payload.objectIndex];
-		auto material = activeScene->materials[obj.materialIndex];
+		auto obj = &activeScene->objects[payload.objectIndex];
+		Material material = activeScene->materials[obj->materialIndex];
 		finalColor += intensity * material.albedo * multiplr;
 		multiplr *= 0.5;
 		ray.origin = payload.worldPosition + 0.0001f * payload.worldNormal;
@@ -96,66 +96,47 @@ glm::vec4 Renderer::perPixel(uint32_t x, uint32_t y)
 	return glm::vec4(finalColor, 1.0f);
 }
 
-Renderer::HitPayload Renderer::TraceRay(const Ray& ray)
+HitPayload Renderer::TraceRay(const Ray& ray)
 {
 	glm::vec3 lightDir = { -1.0f, -1.0f, -1.0f };
 	lightDir = glm::normalize(lightDir);
 	float intensity = 0.0f;
-	size_t size = activeScene->spheres.size();
+	size_t size = activeScene->objects.size();
 	if (size == 0)
 	{
 		return Miss(ray);
 	}
+	HitPayload payload;
 
-	int closetSphere = -1;
-	float hitDistance = FLT_MAX;
+	float max_limit = FLT_MAX;
 	for (size_t i = 0; i < size; i++)
 	{
-		Sphere s = activeScene->spheres[i];
-		glm::vec3 origin = ray.origin - s.origin;
-		//(bx^2 + by^2 + bz^2) t^2 + 2(axbx + ayby + axyz)t + (ax^2 + ay^2 + az^2 - r^2) = 0;
-		float a = glm::dot(ray.direction, ray.direction);
-		float b = 2.0f * glm::dot(ray.direction, origin);
-		float c = glm::dot(origin, origin) - s.radius * s.radius;
-
-		float discriminant = b * b - 4.0f * a * c;
-		if (discriminant < 0)
-		{
-			continue;
-		}
-		
-		float t0 = (-b - glm::sqrt(discriminant)) / 2.0f * a;
-		//float t1 = (-b + glm::sqrt(discriminant)) / 2.0f * a;
-		//float t = t0 >= 0 ? t0 : t1;
-		if (t0 < hitDistance && t0 > 0.)
-		{
-			closetSphere = i;
-			hitDistance = t0;
-		}
+		auto object = &activeScene->objects[i];
+		if (object->Hit(ray, 0.0f, max_limit, i, payload)) {
+			max_limit = payload.hitDistance;
+		}		
 	}
-
-	if (closetSphere < 0)
+	if (payload.objectIndex < 0)
 	{
 		return Miss(ray);
 	}
-	return HitclosetObj(ray, hitDistance, closetSphere);
-}
-
-Renderer::HitPayload Renderer::HitclosetObj(const Ray& ray, float hitDistance, uint32_t objectIndex)
-{
-	auto hitObj = activeScene->spheres[objectIndex];
-	Renderer::HitPayload payload;
-	payload.objectIndex = objectIndex;
-	payload.hitDistance = hitDistance;
-	glm::vec3 worldPosition = ray.origin - hitObj.origin + hitDistance * ray.direction;
-	payload.worldNormal = glm::normalize(worldPosition);
-	payload.worldPosition = worldPosition + hitObj.origin;
+	HitclosetObj(ray, payload);
 	return payload;
 }
 
-Renderer::HitPayload Renderer::Miss(const Ray& ray)
+void Renderer::HitclosetObj(const Ray& ray, HitPayload& payload)
 {
-	Renderer::HitPayload payload;
+	HitPayload result;
+	result.hitDistance = payload.hitDistance;
+	result.objectIndex = payload.objectIndex;
+	auto hitObj = &activeScene->objects[payload.objectIndex];
+	payload.worldPosition = ray.origin + payload.hitDistance * ray.direction;
+	payload.worldNormal = hitObj->GetNormal(payload.worldPosition);
+}
+
+HitPayload Renderer::Miss(const Ray& ray)
+{
+	HitPayload payload;
 	payload.hitDistance = -1;
 	return payload;
 }

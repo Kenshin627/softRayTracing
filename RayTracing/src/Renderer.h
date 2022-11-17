@@ -4,9 +4,8 @@
 #include <memory>
 #include <glm/glm.hpp>
 #include "Camera.h"
-#include "Ray.h"
 #include "Scene.h"
-
+#include "./Geometry/Sphere.h"
 
 class Renderer
 {
@@ -17,16 +16,10 @@ private:
 	struct Setting {
 		bool accumulate = false;
 	};
-	struct HitPayload {
-		float hitDistance;
-		glm::vec3 worldPosition;
-		glm::vec3 worldNormal;
-		uint32_t objectIndex;
-	};
 	glm::vec4 perPixel(uint32_t x, uint32_t y);
-	Renderer::HitPayload TraceRay(const Ray& ray);
-	Renderer::HitPayload HitclosetObj(const Ray& ray, float hitDistance, uint32_t objIndex);
-	Renderer::HitPayload Miss(const Ray& ray);
+	HitPayload TraceRay(const Ray& ray);
+	void HitclosetObj(const Ray& ray, HitPayload& payload);
+	HitPayload Miss(const Ray& ray);
 
 private:
 	std::shared_ptr<Walnut::Image> m_FinalImage;

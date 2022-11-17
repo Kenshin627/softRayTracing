@@ -1,0 +1,49 @@
+#include <glm/glm.hpp>
+
+class Sphere:public Hittable
+{
+public:
+	Sphere() {}
+	Sphere(const glm::vec3& position, uint32_t matIndex, float radius) :position(position), radius(radius) 
+	{
+		materialIndex = matIndex;
+	}
+	glm::vec3 position{ 0.0f };
+	int materialIndex{ -1 };
+	float radius{ 0.5f };
+	virtual bool Hit(const Ray& ray, float t_min, float t_max, uint32_t index, HitPayload& payload) const override;
+	virtual glm::vec3 GetNormal(const glm::vec3& p) const override;
+};
+
+bool Sphere::Hit(const Ray& ray, float t_min, float t_max, uint32_t index, HitPayload& payload) const
+{
+	glm::vec3 origin = ray.origin - origin;
+	float a = glm::dot(ray.direction, ray.direction);
+	float b = 2.0f * glm::dot(ray.direction, origin);
+	float c = glm::dot(origin, origin) - radius * radius;
+
+	float discriminant = b * b - 4.0f * a * c;
+	if (discriminant < 0)
+	{
+		return false;
+	}
+	float t0 = (-b - glm::sqrt(discriminant)) / 2.0f * a;
+	float t1 = (-b + glm::sqrt(discriminant)) / 2.0f * a;
+	float root = t0;
+	if (root < t_min || root > t_max)
+	{
+		root = t1;
+		if (root < t_min || root > t_max)
+		{
+			return false;
+		}
+	}
+	payload.hitDistance = root;
+	payload.objectIndex = index;
+}
+
+
+glm::vec3 Sphere::GetNormal(const glm::vec3& p) const
+{
+	return glm::normalize(p - position);
+}

@@ -30,15 +30,15 @@ public:
 		scene.materials.push_back(mat2);
 
 		Sphere s1;
-		s1.origin = glm::vec3(0.0f, 0.0f, 0.0f);
+		s1.position = glm::vec3(0.0f, 0.0f, 0.0f);
 		s1.radius = 1.0f;
 		s1.materialIndex = 0;
 		Sphere s2;
-		s2.origin = glm::vec3(0.0f, -101.0f, 0.0f);
+		s2.position = glm::vec3(0.0f, -101.0f, 0.0f);
 		s2.radius = 100.0f;
 		s2.materialIndex = 1;
-		scene.spheres.push_back(s1);
-		scene.spheres.push_back(s2);
+		scene.objects.push_back(s1);
+		scene.objects.push_back(s2);
 	}
 
 	virtual void OnUpdate(float ts) override
@@ -67,13 +67,13 @@ public:
 		ImGui::End();
 
 		ImGui::Begin("Scene");
-		for (size_t i = 0; i < scene.spheres.size(); i++)
+		for (size_t i = 0; i < scene.objects.size(); i++)
 		{
-			Sphere& s = scene.spheres[i];
+			Hittable& s = scene.objects[i];
 			ImGui::PushID(i);
 
-			ImGui::DragFloat3("position", glm::value_ptr(s.origin), 0.1f);
-			ImGui::DragFloat("radius", &s.radius, 0.01f);
+			ImGui::DragFloat3("position", glm::value_ptr(s.position), 0.1f);
+			//ImGui::DragFloat("radius", &s.radius, 0.01f);
 			//ImGui::ColorEdit3("albedo", glm::value_ptr(s.albedo));
 			ImGui::Separator();
 			ImGui::PopID();
