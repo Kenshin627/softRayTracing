@@ -1,5 +1,6 @@
 #include "Renderer.h"
 #include "Walnut/Random.h"
+#include "Utils.h"
 
 namespace Utils {
 
@@ -90,8 +91,16 @@ glm::vec4 Renderer::perPixel(uint32_t x, uint32_t y)
 		Material material = activeScene->materials[(&activeScene->objects[payload.objectIndex])->materialIndex];
 		finalColor += intensity * material.albedo * multiplr;
 		multiplr *= 0.5;
-		ray.origin = payload.worldPosition + 0.0001f * payload.worldNormal;
-		ray.direction = glm::reflect(ray.direction, payload.worldNormal) + material.roughness * Walnut::Random::Vec3(-0.5, 0.5);
+		glm::vec3 target = payload.worldPosition + 0.0001f * payload.worldNormal;
+		ray.origin = target;
+		//cherno version
+		//ray.direction = glm::reflect(ray.direction, payload.worldNormal) + material.roughness * Walnut::Random::Vec3(-0.5, 0.5);
+
+		//diffuse
+		//ray.direction = target + payload.worldNormal + random_in_unitSphere() - target;
+
+		//trueLambertian
+		ray.direction = target + payload.worldNormal + random_unit_vector() - target;
 	}
 	return glm::vec4(finalColor, 1.0f);
 }
