@@ -35,3 +35,8 @@ inline glm::vec3 random_unit_vector()
 {
 	return glm::normalize(random_in_unitSphere());
 }
+
+inline bool near_zero(const glm::vec3& p) {
+	const auto s = 1e-8;
+	return (fabs(p[0]) < s) && (fabs(p[1]) < s) && (fabs(p[2]) < s);
+}

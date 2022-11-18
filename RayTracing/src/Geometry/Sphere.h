@@ -4,12 +4,12 @@ class Sphere
 {
 public:
 	Sphere() {}
-	Sphere(const glm::vec3& position, uint32_t matIndex, float radius) :position(position), radius(radius) 
+	Sphere(const glm::vec3& position, std::shared_ptr<Material> material, float radius) :position(position), radius(radius) 
 	{
-		materialIndex = matIndex;
+		material = material;
 	}
 	glm::vec3 position{ 0.0f };
-	int materialIndex{ -1 };
+	std::shared_ptr<Material> material;
 	float radius{ 0.5f };
 public:
 	bool Hit(const Ray& ray, float t_min, float t_max, uint32_t index, HitPayload& payload) const
