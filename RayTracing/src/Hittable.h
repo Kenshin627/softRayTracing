@@ -1,3 +1,5 @@
+#pragma once
+
 #include "Ray.h"
 
 struct HitPayload {

@@ -1,4 +1,5 @@
 #include <glm/glm.hpp>
+#include "../Material//Material.h"
 
 class Sphere
 {

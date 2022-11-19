@@ -6,6 +6,7 @@
 
 #include "Renderer.h"
 #include <glm/gtc/type_ptr.hpp>
+#include "./Material//Lambertian.h"
 
 
 using namespace Walnut;
@@ -17,28 +18,30 @@ public:
 		: activeCamera(45.0f, 0.1f, 100.0f, glm::vec3(0, 0, 6), glm::vec3(0, 0, -1), glm::vec3(0, 1, 0))
 	{
 
-		Material mat;
+		Lambertian mat;
 		mat.albedo = glm::vec3(1.0, 0.3725, 0.10588);
-		mat.roughness = 1.0f;
-		mat.metalness = 0.0f;
 
-		Material mat2;
+		Lambertian mat2;
 		mat2.albedo = glm::vec3(0.57, 0.57, 0.57);
-		mat2.roughness = 0.5f;
-		mat2.metalness = 0.0f;
-		scene.materials.push_back(mat);
-		scene.materials.push_back(mat2);
+
+		addMaterial(std::make_shared<Lambertian>(mat));
+		addMaterial(std::make_shared<Lambertian>(mat2));
 
 		Sphere s1;
 		s1.position = glm::vec3(0.0f, 0.0f, 0.0f);
 		s1.radius = 1.0f;
-		s1.materialIndex = 0;
+		s1.material = std::make_shared<Lambertian>(mat);
 		Sphere s2;
 		s2.position = glm::vec3(0.0f, -101.0f, 0.0f);
 		s2.radius = 100.0f;
-		s2.materialIndex = 1;
+		s2.material = std::make_shared<Lambertian>(mat2);
 		scene.objects.push_back(s1);
 		scene.objects.push_back(s2);
+	}
+
+	void addMaterial(std::shared_ptr<Material> matPtr)
+	{
+		scene.materials.push_back(matPtr);
 	}
 
 	virtual void OnUpdate(float ts) override
@@ -79,11 +82,10 @@ public:
 
 		for (size_t i = 0; i < scene.materials.size(); i++)
 		{
-			Material& material = scene.materials[i];
 			ImGui::PushID(i);
-			ImGui::DragFloat("roughness", &material.roughness, 0.1);
-			ImGui::DragFloat("metalness", &material.metalness, 0.1);
-			ImGui::ColorEdit3("albedo", glm::value_ptr(material.albedo));
+			//ImGui::DragFloat("roughness", &material.roughness, 0.1);
+			//ImGui::DragFloat("metalness", &material.metalness, 0.1);
+			ImGui::ColorEdit3("albedo", glm::value_ptr(scene.materials[i]->albedo), 0);
 			ImGui::PopID();
 		}
 

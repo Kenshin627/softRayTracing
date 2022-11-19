@@ -88,8 +88,8 @@ glm::vec4 Renderer::perPixel(uint32_t x, uint32_t y)
 		}
 		float intensity = glm::max(0.0f, glm::dot(-lightDir, payload.worldNormal));
 		//auto obj = &activeScene->objects[payload.objectIndex];
-		Material material = activeScene->materials[(&activeScene->objects[payload.objectIndex])->materialIndex];
-		finalColor += intensity * material.albedo * multiplr;
+		//std::shared_ptr<Material> material = (&activeScene->objects[payload.objectIndex])->material;
+		finalColor += intensity * (&activeScene->objects[payload.objectIndex])->material->albedo * multiplr;
 		multiplr *= 0.5;
 		glm::vec3 target = payload.worldPosition + 0.0001f * payload.worldNormal;
 		ray.origin = target;

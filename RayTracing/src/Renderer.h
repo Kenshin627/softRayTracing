@@ -6,7 +6,6 @@
 #include "Camera.h"
 #include "Scene.h"
 
-
 class Renderer
 {
 public:
