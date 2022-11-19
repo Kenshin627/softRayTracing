@@ -132,6 +132,7 @@ void Renderer::HitclosetObj(const Ray& ray, HitPayload& payload)
 	Sphere hitObj = activeScene->objects[payload.objectIndex];
 	payload.worldPosition = ray.origin + payload.hitDistance * ray.direction;
 	payload.worldNormal = hitObj.GetNormal(payload.worldPosition);
+	payload.setFrontFace(ray, payload.worldNormal);
 	payload.material = hitObj.material;
 }
 

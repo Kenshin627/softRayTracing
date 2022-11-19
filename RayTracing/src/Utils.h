@@ -40,3 +40,13 @@ inline bool near_zero(const glm::vec3& p) {
 	const auto s = 1e-8;
 	return (fabs(p[0]) < s) && (fabs(p[1]) < s) && (fabs(p[2]) < s);
 }
+
+inline glm::vec3 Refract(const glm::vec3& in, const glm::vec3& n, double refract_ratio)
+{
+	auto cos_theta = fmin(glm::dot(-in, n), 1.0);
+	glm::vec3 a = (in + glm::vec3(n.x * cos_theta, n.y * cos_theta, n.z * cos_theta));
+	glm::vec3 r_out_perp = glm::vec3(refract_ratio * a.x, refract_ratio * a.y, refract_ratio * a.z);
+	double b = -sqrt(fabs(1.0 - glm::dot(r_out_perp, r_out_perp)));
+	glm::vec3 r_out_parallel =  glm::vec3(n.x * b, n.y * b, n.z * b);
+	return r_out_perp + r_out_parallel;
+}

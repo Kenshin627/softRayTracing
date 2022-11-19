@@ -7,10 +7,17 @@ class Material;
 
 struct HitPayload {
 	float hitDistance{ -1.0f };
-	glm::vec3 worldPosition;
-	glm::vec3 worldNormal;
+	glm::vec3 worldPosition{ 0.0f };
+	glm::vec3 worldNormal{ 0.0f };
 	uint32_t objectIndex;
-	std::shared_ptr<Material> material;
+	bool front_face;
+	std::shared_ptr<Material> material = nullptr;
+	void setFrontFace(const Ray& ray, const glm::vec3 outward_normal)
+	{
+		front_face = glm::dot(ray.direction, outward_normal) < 0;
+		worldNormal = front_face ? outward_normal : -outward_normal;
+	}
+	
 };
 
 class Hittable {
