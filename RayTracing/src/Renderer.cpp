@@ -70,12 +70,14 @@ void Renderer::Render(const Scene& scene, const Camera& camera)
 glm::vec4 Renderer::perPixel(uint32_t x, uint32_t y)
 {
 	Ray ray;
+	Ray scatterd;
 	glm::vec3 finalColor(0.0f);
 	ray.origin = activeCamera->GetPosition();
 	ray.direction = activeCamera->GetRayDirections()[x + y * m_FinalImage->GetWidth()];
 	int bounces = 5;
 	glm::vec3 sky(0.6f, 0.7f, 0.9f);
 	glm::vec3 lightDir(-1.0f, -1.0f, -1.0f);
+	glm::vec3 attenuation;
 	lightDir = glm::normalize(lightDir);
 	float multiplr = 1.0f;
 	for (size_t i = 0; i < bounces; i++)
@@ -87,20 +89,12 @@ glm::vec4 Renderer::perPixel(uint32_t x, uint32_t y)
 			break;
 		}
 		float intensity = glm::max(0.0f, glm::dot(-lightDir, payload.worldNormal));
-		//auto obj = &activeScene->objects[payload.objectIndex];
-		//std::shared_ptr<Material> material = (&activeScene->objects[payload.objectIndex])->material;
-		finalColor += intensity * (&activeScene->objects[payload.objectIndex])->material->albedo * multiplr;
-		multiplr *= 0.5;
-		glm::vec3 target = payload.worldPosition + 0.0001f * payload.worldNormal;
-		ray.origin = target;
-		//cherno version
-		//ray.direction = glm::reflect(ray.direction, payload.worldNormal) + material.roughness * Walnut::Random::Vec3(-0.5, 0.5);
-
-		//diffuse
-		//ray.direction = target + payload.worldNormal + random_in_unitSphere() - target;
-
-		//trueLambertian
-		ray.direction = target + payload.worldNormal + random_unit_vector() - target;
+		if (payload.material->scatter(ray, payload, attenuation, scatterd))
+		{
+			finalColor += attenuation * intensity * multiplr;
+			ray = scatterd;
+			multiplr *= 0.5;
+		}		
 	}
 	return glm::vec4(finalColor, 1.0f);
 }
@@ -138,6 +132,7 @@ void Renderer::HitclosetObj(const Ray& ray, HitPayload& payload)
 	Sphere hitObj = activeScene->objects[payload.objectIndex];
 	payload.worldPosition = ray.origin + payload.hitDistance * ray.direction;
 	payload.worldNormal = hitObj.GetNormal(payload.worldPosition);
+	payload.material = hitObj.material;
 }
 
 HitPayload Renderer::Miss(const Ray& ray)

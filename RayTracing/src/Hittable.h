@@ -1,12 +1,16 @@
 #pragma once
 
 #include "Ray.h"
+//#include "./Material/Material.h"
+
+class Material;
 
 struct HitPayload {
 	float hitDistance{ -1.0f };
 	glm::vec3 worldPosition;
 	glm::vec3 worldNormal;
 	uint32_t objectIndex;
+	std::shared_ptr<Material> material;
 };
 
 class Hittable {

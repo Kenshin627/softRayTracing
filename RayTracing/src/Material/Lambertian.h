@@ -9,10 +9,15 @@ public:
 	{
 		albedo = a;
 	}
+public:
 	virtual bool scatter(const Ray& ray_in, const HitPayload& payload, glm::vec3& attenuation, Ray& scattered) const override
 	{
 		glm::vec3 scatter_direction = payload.worldNormal + random_unit_vector();
-		scattered = Ray(payload.worldNormal, scatter_direction);
+		if (near_zero(scatter_direction))
+		{
+			scatter_direction = payload.worldNormal;
+		}
+		scattered = Ray(payload.worldPosition + 0.001f * payload.worldNormal, scatter_direction);
 		attenuation = albedo;
 		return true;
 	}

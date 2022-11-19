@@ -1,5 +1,5 @@
 #pragma once
-
+#include "../Ray.h"
 #include "../Hittable.h"
 
 class Material
