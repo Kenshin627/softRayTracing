@@ -7,7 +7,7 @@ class Dielectric : public Material
 public:
 	Dielectric() {}
 	Dielectric(double index_of_refraction):ir(index_of_refraction) {}
-	virtual bool scatter(const Ray& ray_in, const HitPayload& payload, glm::vec3& attenuation, Ray& scattered) const override
+	virtual bool scatter(const Ray& ray_in, const HitPayload& payload, glm::vec3& attenuation, Ray& scattered, const glm::vec3& lightDir) const override
 	{
 		attenuation = glm::vec3(1.0f);
 		double refract_ratio = payload.front_face ? 1.0 / ir : ir;

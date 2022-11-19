@@ -1,7 +1,6 @@
 #pragma once
 
 #include "Ray.h"
-//#include "./Material/Material.h"
 
 class Material;
 
@@ -9,6 +8,7 @@ struct HitPayload {
 	float hitDistance{ -1.0f };
 	glm::vec3 worldPosition{ 0.0f };
 	glm::vec3 worldNormal{ 0.0f };
+	//glm::vec3 lightDir;
 	uint32_t objectIndex;
 	bool front_face;
 	std::shared_ptr<Material> material = nullptr;

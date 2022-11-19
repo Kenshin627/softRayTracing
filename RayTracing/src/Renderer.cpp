@@ -83,15 +83,16 @@ glm::vec4 Renderer::perPixel(uint32_t x, uint32_t y)
 	for (size_t i = 0; i < bounces; i++)
 	{
 		Renderer:HitPayload payload = TraceRay(ray);
+		//payload.lightDir = lightDir;
 		if (payload.hitDistance < 0.0f)
 		{
 			finalColor += sky * multiplr;
 			break;
 		}
-		float intensity = glm::max(0.0f, glm::dot(-lightDir, payload.worldNormal));
-		if (payload.material->scatter(ray, payload, attenuation, scatterd))
+		
+		if (payload.material->scatter(ray, payload, attenuation, scatterd, lightDir))
 		{
-			finalColor += attenuation * intensity * multiplr;
+			finalColor += attenuation  * multiplr;
 			ray = scatterd;
 			multiplr *= 0.5;
 		}		

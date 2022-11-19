@@ -12,7 +12,7 @@ public:
 		albedo = color;
 	}
 public:
-	virtual bool scatter(const Ray& ray_in, const HitPayload& payload, glm::vec3& attenuation, Ray& scattered) const override
+	virtual bool scatter(const Ray& ray_in, const HitPayload& payload, glm::vec3& attenuation, Ray& scattered, const glm::vec3& lightDir) const override
 	{
 		attenuation = albedo;
 		scattered.origin = payload.worldPosition + 0.001f * payload.worldNormal;
