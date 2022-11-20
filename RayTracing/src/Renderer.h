@@ -19,6 +19,7 @@ private:
 	void HitclosetObj(const Ray& ray, HitPayload& payload);
 	glm::vec4 perPixel(uint32_t x, uint32_t y);
 	HitPayload TraceRay(const Ray& ray);
+	glm::vec3 Ray_color(const Ray& ray, int depth);
 
 private:
 	std::shared_ptr<Walnut::Image> m_FinalImage;

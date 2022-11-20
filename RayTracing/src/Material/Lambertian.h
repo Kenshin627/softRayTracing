@@ -9,16 +9,15 @@ public:
 		albedo = a;
 	}
 public:
-	virtual bool scatter(const Ray& ray_in, const HitPayload& payload, glm::vec3& attenuation, Ray& scattered, const glm::vec3& lightDir) const override
+	virtual bool scatter(const Ray& ray_in, const HitPayload& payload, glm::vec3& attenuation, Ray& scattered) const override
 	{
-		glm::vec3 scatter_direction = payload.worldNormal + random_unit_vector();
+		glm::vec3 scatter_direction = glm::normalize(payload.worldNormal + random_unit_vector());
 		if (near_zero(scatter_direction))
 		{
 			scatter_direction = payload.worldNormal;
 		}
 		scattered = Ray(payload.worldPosition + 0.001f * payload.worldNormal, scatter_direction);
-		float intensity = glm::max(0.0f, glm::dot(-lightDir, payload.worldNormal));
-		attenuation = albedo * intensity;
+		attenuation = albedo;
 		return true;
 	}
 };

@@ -53,6 +53,7 @@ void Renderer::Render(const Scene& scene, const Camera& camera)
 			m_accumulateData[x + m_FinalImage->GetWidth() * y] += color;
 			glm::vec4 accumulateColor = m_accumulateData[x + m_FinalImage->GetWidth() * y];
 			accumulateColor /= (float)frameIndex;
+			accumulateColor = sqrt(accumulateColor);
 			accumulateColor = glm::clamp(accumulateColor, glm::vec4(0.0f), glm::vec4(1.0f));
 			m_ImageData[x + m_FinalImage->GetWidth() * y] = Utils::ConvertToRGBA(accumulateColor);
 		}
@@ -70,34 +71,36 @@ void Renderer::Render(const Scene& scene, const Camera& camera)
 glm::vec4 Renderer::perPixel(uint32_t x, uint32_t y)
 {
 	Ray ray;
-	Ray scatterd;
 	glm::vec3 finalColor(0.0f);
 	ray.origin = activeCamera->GetPosition();
 	ray.direction = activeCamera->GetRayDirections()[x + y * m_FinalImage->GetWidth()];
-	int bounces = 5;
-	glm::vec3 sky(0.6f, 0.7f, 0.9f);
-	glm::vec3 lightDir(-1.0f, -1.0f, -1.0f);
-	glm::vec3 attenuation;
-	lightDir = glm::normalize(lightDir);
-	float multiplr = 1.0f;
-	for (size_t i = 0; i < bounces; i++)
-	{
-		Renderer:HitPayload payload = TraceRay(ray);
-		//payload.lightDir = lightDir;
-		if (payload.hitDistance < 0.0f)
-		{
-			finalColor += sky * multiplr;
-			break;
-		}
-		
-		if (payload.material->scatter(ray, payload, attenuation, scatterd, lightDir))
-		{
-			finalColor += attenuation  * multiplr;
-			ray = scatterd;
-			multiplr *= 0.5;
-		}		
-	}
+	int bounces = 50;
+	finalColor = Ray_color(ray, bounces);
 	return glm::vec4(finalColor, 1.0f);
+}
+
+glm::vec3 Renderer::Ray_color(const Ray& ray, int depth)
+{
+	glm::vec3 sky(0.5f, 0.7f, 1.0f);
+	//glm::vec3 lightDir(-1.0f, -1.0f, -1.0f);
+	//lightDir = glm::normalize(lightDir);
+	if (depth <= 0)
+	{
+		return glm::vec3(0.0, 0.0, 0.0);
+	}
+	Renderer:HitPayload payload = TraceRay(ray);
+	if (payload.hitDistance < 0.0f)
+	{
+		auto t = ray.direction.y * 0.5f + 0.5f;
+		return (1.0f - t) * glm::vec3(1.0f) + t * sky;
+	}
+	glm::vec3 attenuation;
+	Ray scattered;
+	if (payload.material->scatter(ray, payload, attenuation, scattered))
+	{
+		return attenuation * Ray_color(scattered, depth - 1);
+	}
+	return glm::vec3(0.0f, 0.0f, 0.0f);
 }
 
 HitPayload Renderer::TraceRay(const Ray& ray)
@@ -120,7 +123,7 @@ HitPayload Renderer::TraceRay(const Ray& ray)
 			max_limit = payload.hitDistance;
 		}		
 	}
-	if (payload.objectIndex < 0)
+	if (payload.hitDistance < 0)
 	{
 		return Miss(ray);
 	}

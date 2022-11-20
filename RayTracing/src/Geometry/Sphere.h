@@ -44,7 +44,7 @@ public:
 
 	glm::vec3 Sphere::GetNormal(const glm::vec3& p) const
 	{
-		return glm::normalize(p - position);
+		return (p - position) / radius;
 	}
 };
 

@@ -21,40 +21,49 @@ public:
 	{
 
 		Lambertian mat;
-		mat.albedo = glm::vec3(1.0, 0.3725, 0.10588);
+		//mat.albedo = glm::vec3(1.0, 0.3725, 0.10588);
+		mat.albedo = glm::vec3(0.1, 0.2, 0.5);
 
 		Lambertian mat2;
-		mat2.albedo = glm::vec3(0.57, 0.57, 0.57);
+		//mat2.albedo = glm::vec3(0.57, 0.57, 0.57);
+		mat2.albedo = glm::vec3(0.8, 0.8, 0.0);
 
 		Metal mat3;
-		mat3.albedo = glm::vec3(0.2, 0.5, 0.2);
-		mat3.fuz = .5;
+		mat3.albedo = glm::vec3(0.8, 0.6, 0.2);
+		mat3.fuz = .0;
 
 		Dielectric mat4;
 		mat4.albedo = glm::vec3(0.8, 0.3, 0.2);
-		mat4.ir = 2.0;
+		mat4.ir = 1.5;
 
 		scene.materials.push_back(std::make_shared<Lambertian>(mat));
 		scene.materials.push_back(std::make_shared<Lambertian>(mat2));
 		scene.materials.push_back(std::make_shared<Metal>(mat3));
 		scene.materials.push_back(std::make_shared<Dielectric>(mat4));
 
+		Sphere ground;
+		ground.position = glm::vec3(0.0f, -101.0f, 0.0f);
+		ground.radius = 100.0f;
+		ground.material = std::make_shared<Lambertian>(mat2);
+
 		Sphere s1;
 		s1.position = glm::vec3(0.0f, 0.0f, 0.0f);
-		s1.radius = 1.0f;
+		s1.radius = .5f;
 		s1.material = std::make_shared<Lambertian>(mat);
+
 		Sphere s2;
-		s2.position = glm::vec3(0.0f, -101.0f, 0.0f);
-		s2.radius = 100.0f;
-		s2.material = std::make_shared<Lambertian>(mat2);
+		s2.position = glm::vec3(1.0f, 0.0f, 0.0f);
+		s2.radius = .5f;
+		s2.material = std::make_shared<Metal>(mat3);
 		Sphere s3;
-		s3.position = glm::vec3(2.0f, 0.0f, 0.0f);
-		s3.radius = 1.0f;
-		s3.material = std::make_shared<Metal>(mat3);
+		s3.position = glm::vec3(-1.0f, 0.0f, 0.0f);
+		s3.radius = .5f;
+		s3.material = std::make_shared<Dielectric>(mat4);
 		Sphere s4;
-		s4.position = glm::vec3(-2.0f, 0.0f, 0.0f);
-		s4.radius = 1.0f;
+		s4.radius = -0.4f;
+		s4.position = glm::vec3(-1.0f, 0.0f, 0.0f);
 		s4.material = std::make_shared<Dielectric>(mat4);
+		scene.objects.push_back(ground);
 		scene.objects.push_back(s1);
 		scene.objects.push_back(s2);
 		scene.objects.push_back(s3);
